@@ -8,59 +8,52 @@ class LinearRegression:
         self.epochs = epochs
         self.lr = lr
         
-    
     def loss_function(self, Y_pred):
         m = len(self.features)
-        loss = 1 / m
         summation = 0
         for i in range(m):
             summation += (Y_pred[i] - self.target[i]) ** 2
-            
-        return loss * summation
+        return summation / m
                 
     def train(self):
-        for i in range(self.epochs):
-            print("epoch: ", i)
+        for epoch in range(self.epochs):
+            print("epoch:", epoch)
             Y_pred = []
-            for j in self.features:
-                y_pred = self.dot_product(j, self.weight) + self.bias
+            for x in self.features:
+                y_pred = self.dot_product(x, self.weight) + self.bias
                 Y_pred.append(y_pred)
             
             loss = self.loss_function(Y_pred)
-            print("The loss is: ", loss)
+            print("Loss:", loss)
             
-            print("old weights: ", self.weight)
-            print("old bias: ", self.bias)
+            print("Old weights:", self.weight)
+            print("Old bias:", self.bias)
             
             self.gradient_descent(Y_pred)
              
-            print("new weights: ", self.weight)
-            print("new bias: ", self.bias)
+            print("New weights:", self.weight)
+            print("New bias:", self.bias)
         
     def gradient_descent(self, Y_pred):
         m = len(self.features)
-        loss_w = 2 / m
-        loss_b = 2 / m
-        
         n = len(self.weight)
         sum_w = [0] * n
         sum_b = 0
+        
         for i in range(m):
+            error = Y_pred[i] - self.target[i]
             for j in range(n):
-                sum_w[j] += (Y_pred[i] - self.target[i]) * self.features[i][j]
-            sum_b += (Y_pred[i] - self.target[i])
+                sum_w[j] += error * self.features[i][j]
+            sum_b += error
             
         for i in range(n):
-            self.weight[i] -= (self.lr * (loss_w * sum_w[i]))
+            self.weight[i] -= self.lr * (2 / m) * sum_w[i]
         
-        self.bias -= (self.lr * (loss_b * sum_b))
+        self.bias -= self.lr * (2 / m) * sum_b
         
-        return
-    
     def dot_product(self, x, w):
         dot_prod = 0
-        m = len(x)
-        for i in range(m):
+        for i in range(len(x)):
             dot_prod += x[i] * w[i]
         return dot_prod
 
@@ -83,5 +76,6 @@ if __name__ == "__main__":
     
     X = [x[0] for x in data]
     Y = [x[1] for x in data]
-    model = LinearRegression(X, Y, 10, 0.1)
+    model = LinearRegression(X, Y, 100, 0.001)
     model.train()
+    print(model.predict([8.0,9.0]))
